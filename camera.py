@@ -16,7 +16,9 @@ def detect_eyes(img_gray, frame_height):
     valid_coords = []
     for (x, y, w, h) in coords:
         if y + h <= frame_height / 2:
-            valid_coords.append((x, y, w, h))
+            new_y = int(y + (h * 0.25))
+            new_h = int(h * 0.75)
+            valid_coords.append((x, new_y, w, new_h))
     return valid_coords
 
 while True:
