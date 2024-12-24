@@ -12,8 +12,18 @@ eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
 
 while True:
     ret, frame = cam.read()
+    if not ret:
+        break
 
-    out.write(frame)
+    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    eyes = eye_cascade.detectMultiScale(gray_frame, scaleFactor=1.1, minNeighbors=5)
+    for (x, y, w, h) in eyes:
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+
+    blurred_frame = cv2.GaussianBlur(frame, (15, 15), 0)
+
+    out.write(frame) 
 
     cv2.imshow('Camera', frame)
 
