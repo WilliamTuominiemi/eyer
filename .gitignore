@@ -1,2 +1,3 @@
 output.mp4
 haarcascade_eye.xml
+haarcascade_frontalface_default.xml
