@@ -8,6 +8,8 @@ frame_height = int(cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 out = cv2.VideoWriter('output.mp4', fourcc, 20.0, (frame_width, frame_height))
 
+eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
+
 while True:
     ret, frame = cam.read()
 
