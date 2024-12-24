@@ -33,7 +33,10 @@ def calculate_view_point(eye_rect, pupil_pos):
     screen_x = int((frame_width / 2)+x_ratio *100)
     screen_y = int((frame_height / 2)+y_ratio *100)
     
-    return (screen_x, screen_y)
+    if 0 <= screen_x < frame_width and 0 <= screen_y < frame_height:
+        return (screen_x, screen_y)
+    else:
+        return None
 
 while True:
     ret, frame = cam.read()
@@ -71,7 +74,8 @@ while True:
             for keypoint in keypoints:
                 center = (int(keypoint.pt[0]), int(keypoint.pt[1]))
 
-                gaze_point = calculate_view_point((ex, ey, ew, eh), center)
+                if(calculate_view_point((ex, ey, ew, eh), center) != None): 
+                    gaze_point = calculate_view_point((ex, ey, ew, eh), center)
 
                 radius = int(keypoint.size / 2)
                 cv2.circle(frame[y+ey:y+ey+eh, x+ex:x+ex+ew], center, radius, (0, 0, 255), 2)
