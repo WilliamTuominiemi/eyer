@@ -11,6 +11,8 @@ out = cv2.VideoWriter('output.mp4', fourcc, 20.0, (frame_width, frame_height))
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
 
+detector = cv2.SimpleBlobDetector_create()
+
 def detect_eyes(img_gray, frame_height):
     coords = eye_cascade.detectMultiScale(img_gray, 1.3, 5)
     valid_coords = []
@@ -30,8 +32,10 @@ while True:
 
     faces = face_cascade.detectMultiScale(gray_frame, 1.3, 5)
 
+    threshold = 25
+
     for (x, y, w, h) in faces:
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 255), 2)
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
         face_roi = gray_frame[y:y+h, x:x+w]
         face = frame[y:y+h, x:x+w]
@@ -39,8 +43,23 @@ while True:
         eyes = detect_eyes(face_roi, h)
 
         for (ex, ey, ew, eh) in eyes:
-            cv2.rectangle(frame, (x+ex, y+ey), (x+ex+ew, y+ey+eh), (0, 0, 255), 2)
+           eye_roi = cv2.equalizeHist(face_roi[ey:ey+eh, ex:ex+ew])
+           _, eye_roi_bw = cv2.threshold(eye_roi, threshold, 255, cv2.THRESH_BINARY)
+           
+           cv2.rectangle(frame, (x+ex, y+ey), (x+ex+ew, y+ey+eh), (0, 0, 255), 1)
 
+           eye_roi_bw = cv2.erode(eye_roi_bw, None, iterations=2)
+           eye_roi_bw = cv2.dilate(eye_roi_bw, None, iterations=4)
+           eye_roi_bw = cv2.medianBlur(eye_roi_bw, 5)
+           
+           detector = cv2.SimpleBlobDetector_create()
+           keypoints = detector.detect(eye_roi_bw)
+           
+           for keypoint in keypoints:
+               center = (int(keypoint.pt[0]), int(keypoint.pt[1]))
+               radius = int(keypoint.size / 2)
+               cv2.circle(frame[y+ey:y+ey+eh, x+ex:x+ex+ew], center, radius, (0, 0, 255), 2)
+   
 
     out.write(frame) 
 
